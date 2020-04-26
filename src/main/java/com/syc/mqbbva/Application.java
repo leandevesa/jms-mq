@@ -36,22 +36,22 @@ public class Application {
 	private static String APP_USER; // User name that application uses to connect to MQ
 	private static String APP_PASSWORD; // Password that the application uses to connect to 
 	private static String QUEUE_NAME; // Queue that the application uses to put and get messages to and from
+	private static String OUTPUT_PATH;
 
-	private final static Logger logger = Logger.getLogger(Application.class);
+	private static Logger logger;
 
 	public static void main(String[] args) {
-
-		logger.info("app init");
 
 		try (InputStream input = new FileInputStream("config.properties")) {
 
 			Properties prop = new Properties();
-			
-			logger.info("reading config.properties");
 
-            // load a properties file
-			prop.load(input);
+            prop.load(input);
+
+			System.setProperty("my.log", prop.getProperty("log.path"));
 			
+			logger = Logger.getLogger(Application.class);
+
 			logger.info("retrieving host");
 			HOST = prop.getProperty("mq.host");
 
@@ -73,8 +73,12 @@ public class Application {
 			logger.info("retrieving queue name");
 			QUEUE_NAME = prop.getProperty("mq.queue.name");
 
+			logger.info("retrieving outputh path");
+			OUTPUT_PATH = prop.getProperty("message.output.path");
+
         } catch (Exception e) {
 			logger.error(e.getMessage());
+			return;
 		}
 		
 		logger.info("booting...");
@@ -115,7 +119,7 @@ public class Application {
 			logger.info("creating bytes listener");
 
 			/************IMPORTANT PART******************************/
-			MessageListener ml = new BytesListener(); // Creates a listener object
+			MessageListener ml = new BytesListener(OUTPUT_PATH); // Creates a listener object
 			
 			logger.info("setting listener");
 			
