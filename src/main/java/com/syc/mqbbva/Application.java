@@ -77,7 +77,8 @@ public class Application {
 			OUTPUT_PATH = prop.getProperty("message.output.path");
 
         } catch (Exception e) {
-			logger.error("error starting app", e);
+			System.out.print(e); // TODO: Log this
+			if (logger != null) logger.error("error starting app", e);
 			return;
 		}
 		
@@ -130,7 +131,16 @@ public class Application {
 			// The messaging system is now set up
 			/********************************************************/
 
-			userInterface(context, connectionFactory, destination);
+			logger.info("args len: " + String.valueOf(args.length));
+			if (args.length > 0) logger.info(args[0]);
+
+			if (args.length > 0 && "ui".equals(args[0])) {
+				userInterface(context, connectionFactory, destination);
+			} else {
+				System.out.println("press any key to exit");
+				BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+				br.readLine();
+			}
 			
 		} catch (Exception e) {
 			// if there is an associated linked exception, print it. Otherwise print the stack trace
