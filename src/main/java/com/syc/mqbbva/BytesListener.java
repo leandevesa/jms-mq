@@ -3,9 +3,6 @@ package com.syc.mqbbva;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import javax.jms.BytesMessage;
 import javax.jms.Message;
@@ -39,21 +36,17 @@ public class BytesListener implements MessageListener {
             bytesMessage.readBytes(bytesResponse);
 
         } catch (Exception e) {
-            logger.error("failed parsing message");
-            logger.error(e.getMessage());
+            logger.error("failed parsing message", e);
             return;
         }
 
         try {
-
-            Path path = Paths.get(this.outputPath);
-            if (Files.notExists(path)) {
-                Files.createDirectories(path);
-            }
-
             mid = mid.replace("ID:", "");
-            File outputFile = new File(this.outputPath + mid + ".txt");
+            String filePath = this.outputPath + mid + ".txt";
+
+            File outputFile = new File(filePath);
             if (!outputFile.exists()) {
+                outputFile.getParentFile().mkdirs();
                 outputFile.createNewFile();
                 OutputStream outStream = new FileOutputStream(outputFile);
                 outStream.write(bytesResponse);
@@ -61,17 +54,11 @@ public class BytesListener implements MessageListener {
             } else {
                 logger.info(mid + " already existed");
             }
-            /*
-            InputStream is = new ByteArrayInputStream(bytesResponse);
-            BufferedReader buf = new BufferedReader(new InputStreamReader(is));
-            String line = buf.readLine();
-            System.out.println(line);
-            */
         } catch (Exception e) {
-            logger.error("failed writing output file");
-            logger.error(e.getMessage());
+            logger.error("failed writing output file", e);
+            return;
         }
 		
-		System.out.println("##exit onMessage"); // So we know when onMessage has finished execution
+		logger.info("message parsed ok!");
 	}
 }
