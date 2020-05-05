@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Properties;
@@ -16,6 +17,7 @@ import javax.jms.Destination;
 import javax.jms.JMSConsumer;
 import javax.jms.JMSContext;
 import javax.jms.JMSProducer;
+import javax.jms.Message;
 
 import com.ibm.msg.client.jms.JmsConnectionFactory;
 import com.ibm.msg.client.jms.JmsFactoryFactory;
@@ -222,7 +224,7 @@ public class Application {
 						System.out.println("--Message Listener stopped.");
 						break;
 					case "sendfile":
-						sendATextFile(connectionFactory, destination);
+						sendFileAsTextMessage(connectionFactory, destination);
 						System.out.println("--Sent text file message.");
 						break;
 					case "exit":
@@ -247,6 +249,36 @@ public class Application {
 			byte[] fileBytes = Files.readAllBytes(Paths.get("file-test.txt"));
 			BytesMessage m = producerContext.createBytesMessage();
 			m.writeBytes(fileBytes);
+			producer.send(destination, m);
+			producerContext.close();
+		} catch (Exception e) {
+			System.out.println("Exception when trying to send a text message!");
+			// if there is an associated linked exception, print it. Otherwise print the stack trace
+			if (e instanceof JMSException) { 
+				JMSException jmse = (JMSException) e;
+				if (jmse.getLinkedException() != null) { 
+					System.out.println(jmse.getLinkedException());
+				}
+				else {
+					jmse.printStackTrace();
+				}
+			} else {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	public static void sendFileAsTextMessage(JmsConnectionFactory connectionFactory, Destination destination) {
+		try {
+			
+
+			byte[] fileBytes = Files.readAllBytes(Paths.get("file-test.txt"));
+			String payload = new String(fileBytes, StandardCharsets.US_ASCII);
+
+			// Need a separate context to create and send the messages because they are received asynchronously
+			JMSContext producerContext = connectionFactory.createContext();
+			JMSProducer producer = producerContext.createProducer();
+			Message m = producerContext.createTextMessage(payload);
 			producer.send(destination, m);
 			producerContext.close();
 		} catch (Exception e) {

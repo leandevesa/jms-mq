@@ -4,9 +4,10 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 
-import javax.jms.BytesMessage;
 import javax.jms.Message;
 import javax.jms.MessageListener;
+
+import com.ibm.msg.client.jms.internal.JmsTextMessageImpl;
 
 import org.apache.log4j.Logger;
 
@@ -22,19 +23,18 @@ public class BytesListener implements MessageListener {
 	public void onMessage(Message message) {
 
         String mid;
-        byte[] bytesResponse;
+        String text;
         
         logger.info("message received");
         logger.info(message.getClass().toString());
 
         try {
-            BytesMessage bytesMessage = (BytesMessage) message;
-            logger.info("body length: " + String.valueOf(bytesMessage.getBodyLength()));
-            mid = bytesMessage.getJMSMessageID();
+            JmsTextMessageImpl textMessage = (JmsTextMessageImpl) message;
+            text = textMessage.getText();
+            logger.info("body length: " + String.valueOf(text.length()));
+            logger.info("text received: " + text);
+            mid = textMessage.getJMSMessageID();
             logger.info("message id: " + mid);
-            bytesResponse = new byte[(int)bytesMessage.getBodyLength()];
-            bytesMessage.readBytes(bytesResponse);
-
         } catch (Exception e) {
             logger.error("failed parsing message", e);
             return;
@@ -49,7 +49,7 @@ public class BytesListener implements MessageListener {
                 outputFile.getParentFile().mkdirs();
                 outputFile.createNewFile();
                 OutputStream outStream = new FileOutputStream(outputFile);
-                outStream.write(bytesResponse);
+                outStream.write(text.getBytes());
                 outStream.close();
             } else {
                 logger.info(mid + " already existed");
