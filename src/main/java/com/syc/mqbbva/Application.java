@@ -46,9 +46,15 @@ public class Application {
 
 		try (InputStream input = new FileInputStream("config.properties")) {
 
+			System.out.println("App init");
+
 			Properties prop = new Properties();
 
-            prop.load(input);
+			System.out.println("Reading props file");
+
+			prop.load(input);
+			
+			System.out.println("Setting log env");
 
 			System.setProperty("my.log", prop.getProperty("log.path"));
 			
@@ -79,7 +85,7 @@ public class Application {
 			OUTPUT_PATH = prop.getProperty("message.output.path");
 
         } catch (Exception e) {
-			System.out.print(e); // TODO: Log this
+			System.out.println(e); // TODO: Log this
 			if (logger != null) logger.error("error starting app", e);
 			return;
 		}
@@ -107,6 +113,12 @@ public class Application {
 		+ ", Connecting to " + QUEUE_NAME);
 
 		try {
+
+			if (args.length > 0 && "hold".equals(args[0])) {
+				BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+				br.readLine();
+			}
+
 			logger.info("creating context");
 
 			context = connectionFactory.createContext(); // This is connection + session. The connection is started by default
