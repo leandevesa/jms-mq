@@ -25,7 +25,7 @@ public class BytesListener implements MessageListener {
         String mid;
         String text;
         
-        logger.info("message received");
+        logger.info("message received, version 0.2");
         logger.info(message.getClass().toString());
 
         try {
