@@ -60,7 +60,7 @@ public class Application {
 			
 			logger = Logger.getLogger(Application.class);
 
-			logger.info("version 0.2 running");
+			logger.info("version 0.3 running");
 
 			logger.info("retrieving host");
 			HOST = prop.getProperty("mq.host");
@@ -88,7 +88,7 @@ public class Application {
 
         } catch (Exception e) {
 			System.out.println(e); // TODO: Log this
-			if (logger != null) logger.error("error starting app", e);
+			if (logger != null) logger.info("error starting app", e);
 			return;
 		}
 		
@@ -163,16 +163,16 @@ public class Application {
 			if (e instanceof JMSException) { 
 				JMSException jmse = (JMSException) e;
 				if (jmse.getLinkedException() != null) { 
-					logger.error("!! JMS exception thrown in application main method !!", e);
-					logger.error("detail", jmse.getLinkedException());
+					logger.info("!! JMS exception thrown in application main method !!", e);
+					logger.info("detail", jmse.getLinkedException());
 				}
 				else {
 					jmse.printStackTrace();
 				}
 			} else {
-				logger.error("!! Failure in application main method !!", e);
+				logger.info("!! Failure in application main method !!", e);
 			}
-			logger.error("starting context failed", e);
+			logger.info("starting context failed", e);
 		}
 	}
 	
@@ -183,13 +183,13 @@ public class Application {
 			ff = JmsFactoryFactory.getInstance(WMQConstants.WMQ_PROVIDER);
 			cf = ff.createConnectionFactory();
 		} catch (JMSException jmse) {
-			logger.error("JMS Exception when trying to create connection factory!", jmse);
+			logger.info("JMS Exception when trying to create connection factory!", jmse);
 			if (jmse.getLinkedException() != null){ // if there is an associated linked exception, print it. Otherwise print the stack trace
-				logger.error("detail 2", ((JMSException) jmse).getLinkedException());
+				logger.info("detail 2", ((JMSException) jmse).getLinkedException());
 			} else {jmse.printStackTrace();}
 			cf = null;
 		} catch (Exception e) {
-			logger.error("Exception trying to create connection factory", e);
+			logger.info("Exception trying to create connection factory", e);
 			cf = null;
 		}
 		return cf;
@@ -207,13 +207,13 @@ public class Application {
 			cf.setStringProperty(WMQConstants.USERID, APP_USER);
 			cf.setStringProperty(WMQConstants.PASSWORD, APP_PASSWORD);
 		} catch (JMSException jmse) {
-			logger.error("JMS Exception when trying to set JMS properties!", jmse);
+			logger.info("JMS Exception when trying to set JMS properties!", jmse);
 			if (jmse.getLinkedException() != null){ // if there is an associated linked exception, print it. Otherwise print the stack trace
-				logger.error("detail 3", ((JMSException) jmse).getLinkedException());
+				logger.info("detail 3", ((JMSException) jmse).getLinkedException());
 			} else {jmse.printStackTrace();}
-			logger.error("detail 4", jmse);
+			logger.info("detail 4", jmse);
 		} catch (Exception e) {
-			logger.error("JMS Exception when trying to set JMS properties! - 2", e);
+			logger.info("JMS Exception when trying to set JMS properties! - 2", e);
 		}
 		return;
 	}

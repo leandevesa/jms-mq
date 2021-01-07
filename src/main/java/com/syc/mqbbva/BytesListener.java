@@ -25,37 +25,61 @@ public class BytesListener implements MessageListener {
         String mid;
         String text;
         
-        logger.info("message received, version 0.2");
+        logger.info("message received, version 0.3");
         logger.info(message.getClass().toString());
 
         try {
             JmsTextMessageImpl textMessage = (JmsTextMessageImpl) message;
+            logger.info("casted ok");
             text = textMessage.getText();
             logger.info("body length: " + String.valueOf(text.length()));
-            logger.info("text received: " + text);
+            try {
+                logger.info("trying to print text");
+                logger.info("text received: " + text);
+            } catch (Exception e) {
+                logger.info("failed printing text", e);
+            }
             mid = textMessage.getJMSMessageID();
             logger.info("message id: " + mid);
         } catch (Exception e) {
-            logger.error("failed parsing message", e);
+            logger.info("failed parsing message", e);
             return;
         }
 
         try {
+            logger.info("trying to create output file");
+
             mid = mid.replace("ID:", "");
+            logger.info("replace ok");
+
             String filePath = this.outputPath + mid + ".txt";
+            logger.info("filepath determined");
 
             File outputFile = new File(filePath);
+            logger.info("file instance ok");
+
             if (!outputFile.exists()) {
+
+                logger.info("file not exists");
                 outputFile.getParentFile().mkdirs();
+                logger.info("dirs created");
+
                 outputFile.createNewFile();
+                logger.info("output created");
+
                 OutputStream outStream = new FileOutputStream(outputFile);
+                logger.info("stream created");
+
                 outStream.write(text.getBytes());
+                logger.info("bytes written");
+
                 outStream.close();
+                logger.info("stream closed");
             } else {
                 logger.info(mid + " already existed");
             }
         } catch (Exception e) {
-            logger.error("failed writing output file", e);
+            logger.info("failed writing output file", e);
             return;
         }
 		
