@@ -60,7 +60,7 @@ public class Application {
 			
 			logger = Logger.getLogger(Application.class);
 
-			logger.info("version 0.3 running");
+			logger.info("version 0.4 running");
 
 			logger.info("retrieving host");
 			HOST = prop.getProperty("mq.host");
