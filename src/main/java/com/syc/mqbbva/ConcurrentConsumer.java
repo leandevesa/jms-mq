@@ -166,10 +166,10 @@ public class ConcurrentConsumer implements Runnable {
     }
 
     private void log(String msg, Exception e) {
-        logger.info(TID + " - " + msg);
+        logger.info(TID + " - " + msg, e);
     }
 
     private void log(Long msg, Exception e) {
-        logger.info(TID + " - " + msg);
+        logger.info(TID + " - " + msg, e);
     }
 }

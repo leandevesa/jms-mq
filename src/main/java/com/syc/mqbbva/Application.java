@@ -49,7 +49,7 @@ public class Application {
 
 	private final static int MAX_THREADS = 200;
 	private final static int THREAD_EXECUTION_WAIT_MS = 1000;
-	private final static int THREADS_LIFETIME_MS = 1800000;
+	private final static int THREADS_LIFETIME_MS = 1800000; // media hs
 
 	private final static List<ConcurrentConsumer> concurrentConsumers = new ArrayList<>();
 
