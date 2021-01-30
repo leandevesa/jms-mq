@@ -153,9 +153,9 @@ public class Application {
 			if (args.length > 0 && "ui".equals(args[0])) {
 				userInterface(context, connectionFactory, destination);
 			} else {
-				System.out.println("press any key to exit");
-				BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-				br.readLine();
+				while (true) {
+					Thread.sleep(500);
+				}
 			}
 			
 		} catch (Exception e) {
