@@ -27,8 +27,10 @@ public class BytesListener implements MessageListener {
 
         String mid;
         String text;
-        
-        logger.info("message received, version 0.4");
+
+        logger.info("TID: " + Thread.currentThread().getId());
+
+        logger.info("message received, version 0.5");
         
         String clazz = message.getClass().toString();
         
