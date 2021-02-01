@@ -1,33 +1,15 @@
 package com.syc.mqbbva;
 
-import java.io.BufferedReader;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
-import javax.jms.JMSException;
-import javax.jms.MessageListener;
-import javax.jms.BytesMessage;
-import javax.jms.Destination;
-import javax.jms.JMSConsumer;
-import javax.jms.JMSContext;
-import javax.jms.JMSProducer;
-import javax.jms.Message;
 
-import com.ibm.msg.client.jms.JmsConnectionFactory;
-import com.ibm.msg.client.jms.JmsFactoryFactory;
-import com.ibm.msg.client.wmq.WMQConstants;
-
+import java.util.stream.Collectors;
 import org.apache.log4j.Logger;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -48,10 +30,11 @@ public class Application {
 	private static Logger logger;
 
 	private final static int MAX_THREADS = 200;
-	private final static int THREAD_EXECUTION_WAIT_MS = 1000;
-	private final static int THREADS_LIFETIME_MS = 1800000; // media hs
+	private final static int THREAD_BETWEEN_CREATION_WAIT_MS = 1000;
+	private final static int THREAD_BETWEEN_STOP_WAIT_MS = 10000;
+	private final static int THREADS_LIFETIME_MS = 60000;
 
-	private final static List<ConcurrentConsumer> concurrentConsumers = new ArrayList<>();
+	private static List<ConcurrentConsumer> concurrentConsumers = new ArrayList<>();
 
 	public static void main(String[] args) throws InterruptedException {
 
@@ -98,7 +81,7 @@ public class Application {
 
 				logger.info("executed ok consumer: " + i);
 
-				Thread.sleep(THREAD_EXECUTION_WAIT_MS);
+				Thread.sleep(THREAD_BETWEEN_CREATION_WAIT_MS);
 			}
 
 			logger.info("waiting for consumers lifetime");
@@ -107,11 +90,26 @@ public class Application {
 
 			logger.info("lifetime ended, stopping consumers");
 
-			concurrentConsumers.forEach(ConcurrentConsumer::stop);
+			for (ConcurrentConsumer consumer : concurrentConsumers) {
+
+				logger.info("trying to stop consumer");
+
+				Thread.sleep(THREAD_BETWEEN_STOP_WAIT_MS);
+
+				consumer.stop();
+			}
 
 			logger.info("consumers stopped");
 
+			concurrentConsumers = concurrentConsumers.stream()
+													 .filter(ConcurrentConsumer::isRunning)
+													 .collect(Collectors.toList());
+
+			logger.info("consumers size after stop: " + concurrentConsumers.size());
+
 			Thread.sleep(5000);
+
+			logger.info("loop reset");
 		}
 	}
 

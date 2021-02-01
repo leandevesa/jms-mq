@@ -116,6 +116,10 @@ public class ConcurrentConsumer implements Runnable {
         logger.info("stopped: " + TID);
     }
 
+    public boolean isRunning() {
+        return this.process;
+    }
+
     private JmsConnectionFactory createJMSConnectionFactory() {
         JmsFactoryFactory ff;
         JmsConnectionFactory cf;
