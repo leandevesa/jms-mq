@@ -30,7 +30,7 @@ public class BytesListener implements MessageListener {
 
         logger.info("TID: " + Thread.currentThread().getId());
 
-        logger.info("message received, version 0.5");
+        logger.info("message received, version 0.6");
         
         String clazz = message.getClass().toString();
         

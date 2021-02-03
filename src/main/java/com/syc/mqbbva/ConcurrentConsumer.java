@@ -92,6 +92,9 @@ public class ConcurrentConsumer implements Runnable {
 
             log("process ended ok!");
 
+            consumer.close();
+            context.close();
+
         } catch (Exception e) {
             // if there is an associated linked exception, print it. Otherwise print the stack trace
             if (e instanceof JMSException) {
