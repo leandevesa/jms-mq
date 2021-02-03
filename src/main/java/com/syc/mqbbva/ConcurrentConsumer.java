@@ -80,9 +80,13 @@ public class ConcurrentConsumer implements Runnable {
 
             MessageListener ml = new BytesListener(OUTPUT_PATH); // Creates a listener object
 
-            log("setting listener");
+            log("setting message listener");
 
             consumer.setMessageListener(ml); // Associates listener object with the consumer
+
+            log("setting exception listener");
+
+            context.setExceptionListener(new ExceptionListenerImpl());
 
             log("The message listener is running."); // (Because the connection is started by default)
 
@@ -93,7 +97,12 @@ public class ConcurrentConsumer implements Runnable {
             log("process ended ok!");
 
             consumer.close();
+
+            log("consumer closed");
+
             context.close();
+
+            log("context closed");
 
         } catch (Exception e) {
             // if there is an associated linked exception, print it. Otherwise print the stack trace
